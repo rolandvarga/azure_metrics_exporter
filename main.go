@@ -6,6 +6,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/RobustPerception/azure_metrics_exporter/config"
 
@@ -101,6 +102,8 @@ func (c *Collector) collectResource(ch chan<- prometheus.Metric, resource string
 
 // Collect - collect results from Azure Montior API and create Prometheus metrics.
 func (c *Collector) Collect(ch chan<- prometheus.Metric) {
+	defer newDiagnostic(time.Now(), len(sc.C.ResourceGroups))
+
 	if err := ac.refreshAccessToken(); err != nil {
 		log.Println(err)
 		ch <- prometheus.NewInvalidMetric(azureErrorDesc, err)
